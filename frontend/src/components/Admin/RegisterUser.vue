@@ -116,7 +116,7 @@
                           type="phone"
                           prepend-icon="phone"
                           clearable
-                          :rules="phoneRules"
+                          :rules="!validatePhones ? 'Informe pelo menos um telefone!' : phoneRules"
                           label="Telefone"
                           required>
             </v-text-field>
@@ -126,7 +126,7 @@
                           type="phone"
                           prepend-icon="phone"
                           clearable
-                          :rules="phoneRules"
+                          :rules="!validatePhones ? 'Informe pelo menos um telefone!' : phoneRules"
                           label="Telefone">
           </v-text-field>
         </v-flex>
@@ -135,48 +135,13 @@
                           type="phone"
                           prepend-icon="phone"
                           clearable
-                          :rules="phoneRules"
+                          :rules="!validatePhones ? 'Informe pelo menos um telefone!' : phoneRules"
                           label="Telefone">
             </v-text-field>
         </v-flex>
       </v-layout>
       <!-- Row 4 -->
-      <v-layout>
-        <v-flex xs12 sm9 md6 lg6 xl4>
-          <v-text-field v-model="nomeLogin"
-                        type="text"
-                        class="px-0"
-                        prepend-icon="face"
-                        clearable
-                        :rules="nameRules"
-                        label="Login"
-                        required>
-          </v-text-field>
-        </v-flex>
-        <v-flex xs12 sm9 md6 lg6 xl4 >
-          <v-menu ref="dataNascimentoHelper"
-                  :close-on-content-click="false"
-                  v-model="dataNascimentoHelper"
-                  :nudge-right="40"
-                  :return-value.sync="dataNascimento"
-                  lazy
-                  transition="scale-transition"
-                  offset-y
-                  full-width
-                  min-width="290px">
-            <v-text-field slot="activator"
-                        v-model="dataNascimento"
-                        label="Data de Nascimento"
-                        prepend-icon="event"
-                        readonly>
-            </v-text-field>
-            <v-date-picker v-model="dataNascimento"
-                            :reactive="reactive"
-                            header-color="primary"
-                            @input="$refs.dataNascimentoHelper.save(dataNascimento)">
-            </v-date-picker>
-          </v-menu>
-        </v-flex>
+      <v-layout>        
         <v-flex xs12 sm9 md6 lg6 xl4>
           <v-menu ref="dataIngressoEmpresaHelper"
                   :close-on-content-click="false"
@@ -222,15 +187,15 @@
         <v-flex>
           <v-text-field v-model="senhaValidacao"
                         color="cyan darken"
-                        label="Senha"
+                        label="Confirmação de Senha"
                         type="password"
                         prepend-icon="fingerprint"
-                        :rules="passwordRules"
-                        placeholder="Confirme a Senha do Funcionário"
+                        :rules="passwordConfirmationRules"
+                        placeholder="Confirme a Senha do Funcionário" 
                         loading >
             <v-progress-linear slot="progress"
-                              :value="progress"
-                              :color="color"
+                              :value="progressConfirmation"
+                              :color="colorConfirmation"
                               height="7">
             </v-progress-linear>
           </v-text-field>
@@ -303,24 +268,26 @@ export default {
       v => /.+@.+/.test(v) || 'Informe um E-mail válido!'
     ],
     salaryRules: [
-      v => v >= 0 || 'Informe um Salário!'
+      v => v >= 0 || 'Informe o Salário!'
     ],
     pisRoles: [
-      v => !!v || 'Informe um número PIS/PASESP!',
-      v => v.length <= 9 || 'Informe um número PIS/PASESP válido!'
+      v => !!v || 'Informe o número PIS/PASESP!',
+      v => v.length <= 11 || 'Informe um número PIS/PASESP válido!'
     ],
     workloadRules: [
-      v => !!v || 'Informe uma Carga Horária!',
+      v => !!v || 'Informe a Carga Horária!',
       v => v.length <= 1 || 'Informe uma Carga Horária válida!'
     ],
     phoneRules: [
-      v => !!v || 'Informe pelo menos um Telefone!',
-      v => v.length <= 9 || 'Informe um número de Telefone válido!',
-      v => v.length >= 8 || 'Informe um número de Telefone válido!'
+      v => (v.length <= 9 || v.length === 0) || 'Informe um número de Telefone válido!',
+      v => (v.length >= 8 || v.length === 0) || 'Informe um número de Telefone válido!'
     ],
     passwordRules: [
       v => !!v || 'Informe uma Senha!'
-      // v => /.[0-9]{1}+[a-z]{1}+[A-Z]{1}./.test(v) || 'Informe uma Senha válida!'
+      // v => /.[0-9]{1}+[a-z]{1}+[A-Z]{1}./.test(v) || 'A senha deve conter pelo menos um numero, uma letra minúscula e uma letra maiúscula!'
+    ],
+    passwordConfirmationRules: [
+
     ]
   }),
   created () {
@@ -332,12 +299,24 @@ export default {
     color () {
       return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]
     },
+    progressConfirmation () {
+      return Math.min(100, this.senhaValidacao.length * 10)
+    },
+    colorConfirmation () {
+      return ['error', 'warning', 'success'][Math.floor(this.progressConfirmation / 40)]
+    },
     title () {
       if (!this.edit) {
         return 'Cadastro de Funcionário'
       } else {
         return 'Alterar Funcionário'
       }
+    },
+    validatePhones () {
+      if (this.telefone1 || this.telefone2 || this.telefone3) {
+        return true
+      }
+      return false
     }
   },
   methods: {
