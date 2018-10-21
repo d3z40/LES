@@ -70,7 +70,7 @@ export default {
   watch: {
   },
   created () {
-    this.callApi()
+    this.callApi({date: new Date()})
   },
   methods: {
     takeAppointment (appointment) {
@@ -192,16 +192,19 @@ export default {
         })
       }
     },
-    callApi () {
-      this.$_axios.get(`${this.$_url}appointment/1`).then(response => {
+    callApi (today) {
+      this.$_axios.patch(`${this.$_url}appointment`, this.appointment).then(response => {
         var result = response.data
         if (result.resultList.length !== 0) {
           // retorno ok /
           this.appointments = result.resultList
           this.appointment = this.appointments[0]
-          this.verifyButtons()
           console.log(JSON.stringify(this.appointments))
+        } else {
+          this.appointment = today
+          this.registerAppointments()
         }
+        this.verifyButtons()
         if (result.mensagem) {
           this.messages = [...result.message]
           this.haveMessage = true

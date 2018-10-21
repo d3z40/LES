@@ -52,6 +52,10 @@ public class Employee extends User {
 	@ManyToOne (fetch = FetchType.LAZY)
 	@JoinColumn(name = "costCentre_id")
 	private CostCentre costCentre;
+	
+	@OneToMany( cascade=CascadeType.ALL )
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List< MonthlyBalance > monthBalanceList;
 
 	public Employee() {}
 	
@@ -129,5 +133,13 @@ public class Employee extends User {
 
 	public void setCostCentre(CostCentre costCentre) {
 		this.costCentre = costCentre;
+	}
+
+	public List<MonthlyBalance> getMonthBalanceList() {
+		return monthBalanceList;
+	}
+
+	public void setMonthBalanceList(List<MonthlyBalance> monthBalanceList) {
+		this.monthBalanceList = monthBalanceList;
 	}
 }

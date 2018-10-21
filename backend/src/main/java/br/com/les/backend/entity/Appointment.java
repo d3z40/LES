@@ -1,19 +1,25 @@
 package br.com.les.backend.entity;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.stereotype.Component;
 
 @Component
 @Entity
 public class Appointment extends DomainEntity {
 	
-	private String date;
+	private LocalDate date;
 	private LocalTime morningEntrance;
 	private LocalTime morningOut;
 	private LocalTime afternoonEntrance;
@@ -29,11 +35,23 @@ public class Appointment extends DomainEntity {
 	@ManyToOne( fetch=FetchType.EAGER )
 	@JoinColumn( name="employee_id" )
 	private Employee employee;
+	
+	@OneToMany( cascade=CascadeType.ALL )
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List< HistChangeMonthlyBalance > histChangeMonthlyBalanceList;
 
 	public Appointment() {}
 	
 	public Appointment( Long employeeId ) {
 		this.employee = new Employee( employeeId );;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
 	public LocalTime getMorningEntrance() {
@@ -100,6 +118,14 @@ public class Appointment extends DomainEntity {
 		this.particularExitReturn = particularExitReturn;
 	}
 
+	public LocalTime getBalance() {
+		return balance;
+	}
+
+	public void setBalance(LocalTime balance) {
+		this.balance = balance;
+	}
+
 	public LocalTime getHoursLeft() {
 		return hoursLeft;
 	}
@@ -124,19 +150,12 @@ public class Appointment extends DomainEntity {
 		this.employee = employee;
 	}
 
-	public LocalTime getBalance() {
-		return balance;
+	public List<HistChangeMonthlyBalance> getHistChangeMonthlyBalanceList() {
+		return histChangeMonthlyBalanceList;
 	}
 
-	public void setBalance(LocalTime balance) {
-		this.balance = balance;
+	public void setHistChangeMonthlyBalanceList(List<HistChangeMonthlyBalance> histChangeMonthlyBalanceList) {
+		this.histChangeMonthlyBalanceList = histChangeMonthlyBalanceList;
 	}
 
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(String date) {
-		this.date = date;
-	}
 }
